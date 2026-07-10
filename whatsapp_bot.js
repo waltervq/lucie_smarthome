@@ -21,7 +21,7 @@ const axios = require('axios');
 // ===================== CONFIGURATION =====================
 
 // URL de votre API PHP sur InfinityFree
-const API_URL = 'https://lucie-smarthome.ct.ws/api.php';
+const API_URL = 'https://lucie-smarthome.onrender.com';
 
 // Clé API (doit correspondre à celle dans api.php)
 const API_KEY = 'IIIIIIIVVVIVIIVIIIIX';
