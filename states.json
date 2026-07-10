@@ -1,4 +1,10 @@
 {
   "gpio26": "off",
-  "gpio27": "off"
+  "gpio27": "off",
+  "gpio25": "off",
+  "gpio33": "off",
+  "gpio32": "off",
+  "gpio14": "off",
+  "temperature": null,
+  "humidite": null
 }
