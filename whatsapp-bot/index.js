@@ -194,6 +194,37 @@ async function handleCommand(cmd, sock, from) {
         return `💧 Humidité actuelle : *${hum}%*`;
     }
 
+    // ---- STATUT ----
+    if (c.match(/statut|status|etat|état/)) {
+        const states = await getStates();
+
+        const devices = [
+            { key: "gpio26", label: "💡 Salon" },
+            { key: "gpio27", label: "💡 Chambre" },
+            { key: "gpio25", label: "💡 Cuisine" },
+            { key: "gpio33", label: "💡 Véranda" },
+            { key: "gpio32", label: "💡 Lampes extérieur" },
+            { key: "gpio14", label: "🌬️ Ventilateur" },
+        ];
+
+        const lines = devices.map(d => {
+            const isOn = states[d.key] === "on";
+            return `${isOn ? "✅" : "🔴"} ${d.label} : ${isOn ? "Allumé" : "Éteint"}`;
+        });
+
+        const temp = states.temperature != null ? `${states.temperature}°C` : "N/A";
+        const hum  = states.humidite    != null ? `${states.humidite}%`    : "N/A";
+
+        return (
+`🏠 *État de la maison :*
+
+${lines.join("\n")}
+
+🌡️ Température : *${temp}*
+💧 Humidité : *${hum}*`
+        );
+    }
+
     // ---- AIDE ----
     if (c.match(/aide|help|\?/)) {
         return (
