@@ -60,8 +60,8 @@ const GROUPS = {
 // Noms lisibles pour les retours WhatsApp
 const ROOM_LABELS = {
     gpio26: "Salon",
-    gpio27: "Chambre",
-    gpio25: "Cuisine",
+    gpio27: "",
+    gpio25: "Chambre",
     gpio33: "Véranda",
     gpio32: "Lampes extérieur",
     gpio14: "Ventilateur",
