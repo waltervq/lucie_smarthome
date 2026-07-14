@@ -356,4 +356,8 @@ async function startBot() {
 }
 
 
-startBot();
+module.exports = {
+    startBot,
+    getQR,
+    isConnected
+};

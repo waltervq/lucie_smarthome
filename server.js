@@ -1,3 +1,5 @@
+const QRCode = require("qrcode");
+const bot = require("./whatsapp-bot");
 const express = require("express");
 const fs = require("fs");
 const cors = require("cors");
@@ -9,6 +11,8 @@ const API_KEY = "IIIIIIIVVVIVIIVIIIIX";
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+// Démarre le bot WhatsApp
+bot.startBot();
 
 
 // ===================== FICHIER D'ÉTATS =====================
@@ -139,6 +143,74 @@ app.post("/api/sensors", (req, res) => {
         success: true,
         temperature,
         humidite
+    });
+
+});
+
+/**
+ * Affiche le QR Code du bot WhatsApp
+ */
+app.get("/qr", async (req, res) => {
+
+    try {
+
+        if (bot.isConnected()) {
+            return res.send(`
+                <html>
+                <body style="font-family:Arial;text-align:center;padding:40px">
+                    <h2>✅ Bot WhatsApp connecté</h2>
+                    <p>Aucun QR Code nécessaire.</p>
+                </body>
+                </html>
+            `);
+        }
+
+        const qr = bot.getQR();
+
+        if (!qr) {
+            return res.send(`
+                <html>
+                <body style="font-family:Arial;text-align:center;padding:40px">
+                    <h2>⌛ Génération du QR Code...</h2>
+                    <p>Actualisez cette page dans quelques secondes.</p>
+                </body>
+                </html>
+            `);
+        }
+
+        const image = await QRCode.toDataURL(qr);
+
+        res.send(`
+            <html>
+            <head>
+                <title>Connexion WhatsApp</title>
+            </head>
+            <body style="font-family:Arial;text-align:center;padding:30px;background:#f5f5f5">
+                <h2>📱 Scanner ce QR avec WhatsApp</h2>
+
+                <img src="${image}" width="320">
+
+                <p>WhatsApp → Appareils connectés → Connecter un appareil</p>
+            </body>
+            </html>
+        `);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Erreur lors de la génération du QR.");
+    }
+
+});
+
+
+/**
+ * État du bot
+ */
+app.get("/bot/status", (req, res) => {
+
+    res.json({
+        connected: bot.isConnected(),
+        qrAvailable: !!bot.getQR()
     });
 
 });
