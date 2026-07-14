@@ -275,20 +275,26 @@ async function startBot() {
     sock.ev.on("connection.update", ({ connection, lastDisconnect, qr }) => {
 
         if (qr) {
-            console.log("Scanne ce QR avec WhatsApp");
-            qrcode.generate(qr, { small: true });
+            currentQR = qr;
+            console.log("QR généré");
         }
 
         if (connection === "open") {
+            connected = true;
+            currentQR = null;
             console.log("✅ Bot WhatsApp connecté");
         }
 
         if (connection === "close") {
+            connected = false;
+
             const reason = lastDisconnect?.error?.output?.statusCode;
+
             if (reason !== DisconnectReason.loggedOut) {
                 startBot();
             }
         }
+
     });
 
     /**

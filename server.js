@@ -11,6 +11,18 @@ const API_KEY = "IIIIIIIVVVIVIIVIIIIX";
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+let currentQR = null;
+let connected = false;
+
+function getQR() {
+    return currentQR;
+}
+
+function isConnected() {
+    return connected;
+}
+
 // Démarre le bot WhatsApp
 bot.startBot();
 
