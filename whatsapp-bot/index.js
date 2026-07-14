@@ -17,7 +17,8 @@ const API_KEY = process.env.API_KEY || "IIIIIIIVVVIVIIVIIIIX";
 const AUTHORIZED_NUMBERS = (process.env.AUTHORIZED_NUMBERS || [
     "243977075005",
     "94296292257905",
-    "243977089129"
+    "243977089129",
+    "196645211865178"
 ].join(","))
     .split(",")
     .map((number) => number.trim())
