@@ -285,16 +285,26 @@ async function startBot() {
     }
 
     starting = true;
-    const { state, saveCreds } = await useMultiFileAuthState(AUTH_DIR);
+    let sock;
 
-    const sock = makeWASocket({
-        auth: state,
-        logger: pino({ level: "silent" })
-    });
-    sockInstance = sock;
-    starting = false;
+    try {
+        const { state, saveCreds } = await useMultiFileAuthState(AUTH_DIR);
 
-    sock.ev.on("creds.update", saveCreds);
+        sock = makeWASocket({
+            auth: state,
+            logger: pino({ level: "silent" })
+        });
+
+        sockInstance = sock;
+        starting = false;
+
+        sock.ev.on("creds.update", saveCreds);
+    } catch (err) {
+        starting = false;
+        sockInstance = null;
+        throw err;
+    }
+
 
     sock.ev.on("connection.update", ({ connection, lastDisconnect, qr }) => {
 

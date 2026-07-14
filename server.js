@@ -48,10 +48,6 @@ function saveStates(data) {
     fs.writeFileSync(STATES_FILE, JSON.stringify(data, null, 2));
 }
 
-bot.startBot().catch((err) => {
-    console.error("[BOT] Impossible de demarrer le bot WhatsApp:", err);
-});
-
 app.get("/", (req, res) => {
     res.json({
         ok: true,
@@ -159,4 +155,10 @@ function renderPage(title, body) {
 app.listen(PORT, () => {
     console.log(`API SmartHome demarree sur port ${PORT}`);
     console.log(`Pins gerees : ${VALID_PINS.join(", ")}`);
+
+    setTimeout(() => {
+        bot.startBot().catch((err) => {
+            console.error("[BOT] Impossible de demarrer le bot WhatsApp:", err.message);
+        });
+    }, 1000);
 });
