@@ -1,1 +1,5 @@
-node_modules
+node_modules/
+whatsapp-bot/node_modules/
+whatsapp-bot/auth/
+.env
+npm-debug.log*

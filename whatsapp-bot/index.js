@@ -4,21 +4,39 @@ const {
     DisconnectReason
 } = require("@whiskeysockets/baileys");
 
-const qrcode = require("qrcode-terminal");
+const path = require("path");
 const axios = require("axios");
 const pino = require("pino");
 
 
 // ===================== CONFIG =====================
-const API_URL = "https://lucie-smarthome.onrender.com/api";
+const API_URL = process.env.API_URL || "https://lucie-smarthome.onrender.com/api";
 
-const API_KEY = "IIIIIIIVVVIVIIVIIIIX";
+const API_KEY = process.env.API_KEY || "IIIIIIIVVVIVIIVIIIIX";
 
-const AUTHORIZED_NUMBERS = [
+const AUTHORIZED_NUMBERS = (process.env.AUTHORIZED_NUMBERS || [
     "243977075005",
     "94296292257905",
     "243977089129"
-];
+].join(","))
+    .split(",")
+    .map((number) => number.trim())
+    .filter(Boolean);
+
+const AUTH_DIR = process.env.WHATSAPP_AUTH_DIR || path.join(__dirname, "auth");
+
+let currentQR = null;
+let connected = false;
+let starting = false;
+let sockInstance = null;
+
+function getQR() {
+    return currentQR;
+}
+
+function isConnected() {
+    return connected;
+}
 
 
 // ===================== MAPPING PIECES / PINS =====================
@@ -262,13 +280,19 @@ ${lines.join("\n")}
 const botSentIds = new Set();
 
 async function startBot() {
+    if (starting || sockInstance) {
+        return sockInstance;
+    }
 
-    const { state, saveCreds } = await useMultiFileAuthState("auth");
+    starting = true;
+    const { state, saveCreds } = await useMultiFileAuthState(AUTH_DIR);
 
     const sock = makeWASocket({
         auth: state,
         logger: pino({ level: "silent" })
     });
+    sockInstance = sock;
+    starting = false;
 
     sock.ev.on("creds.update", saveCreds);
 
@@ -287,11 +311,18 @@ async function startBot() {
 
         if (connection === "close") {
             connected = false;
+            currentQR = null;
+            sockInstance = null;
+            starting = false;
 
             const reason = lastDisconnect?.error?.output?.statusCode;
 
             if (reason !== DisconnectReason.loggedOut) {
-                startBot();
+                setTimeout(() => {
+                    startBot().catch((err) => {
+                        console.error("[BOT] Erreur de reconnexion:", err.message);
+                    });
+                }, 3000);
             }
         }
 
@@ -359,6 +390,7 @@ async function startBot() {
 
     });
 
+    return sock;
 }
 
 
