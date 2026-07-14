@@ -185,22 +185,39 @@ void pollAPI() {
 
 
 // ===================== ENVOI CAPTEURS DHT22 =====================
+// ===================== ENVOI CAPTEURS DHT22 =====================
 void sendSensorData() {
-  if (WiFi.status() != WL_CONNECTED) return;
 
+  if (WiFi.status() != WL_CONNECTED)
+    return;
+
+  // Lecture du capteur
   float temperature = dht.readTemperature();
-  float humidite    = dht.readHumidity();
+  float humidite = dht.readHumidity();
 
-  // Vérification lecture valide
+  // Vérifier la lecture
   if (isnan(temperature) || isnan(humidite)) {
-    Serial.println("[DHT] Lecture invalide, capteur non connecté ?");
+    Serial.println("[DHT] Erreur lecture capteur");
     return;
   }
 
-  Serial.print("[DHT] Temp="); Serial.print(temperature);
-  Serial.print("°C | Hum="); Serial.print(humidite); Serial.println("%");
+  // Vérifier les valeurs plausibles
+  if (temperature < -40 || temperature > 80 ||
+      humidite < 0 || humidite > 100) {
+    Serial.println("[DHT] Valeurs invalides");
+    return;
+  }
 
-  // Construction du body
+  // Correction de calibration (à ajuster si nécessaire)
+  // Exemple : le capteur affiche 0.8°C de trop
+  // temperature -= 0.8;
+
+  Serial.print("[DHT] Température : ");
+  Serial.print(temperature, 2);
+  Serial.print(" °C   Humidité : ");
+  Serial.print(humidite, 2);
+  Serial.println(" %");
+
   String postData = "key=";
   postData += API_KEY;
   postData += "&temperature=";
@@ -216,11 +233,12 @@ void sendSensorData() {
   int httpCode = http.POST(postData);
 
   if (httpCode == HTTP_CODE_OK) {
-    Serial.println("[DHT] Données envoyées à l'API ✓");
+    Serial.println("[DHT] Données envoyées ✓");
   } else {
-    Serial.print("[DHT] Erreur envoi : code ");
+    Serial.print("[HTTP] Erreur : ");
     Serial.println(httpCode);
   }
 
   http.end();
 }
+

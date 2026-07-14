@@ -23,19 +23,19 @@ const AUTHORIZED_NUMBERS = [
 // ===================== MAPPING PIECES / PINS =====================
 // Chaque pièce = une ou plusieurs clés GPIO
 const ROOMS = {
-    salon:     ["gpio26"],
-    chambre:   ["gpio27"],
-    cuisine:   ["gpio25"],
-    veranda:   ["gpio33"],
+    salon: ["gpio26"],
+    chambre: ["gpio25"],
+    cuisine: ["gpio27"],
+    veranda: ["gpio33"],
     exterieur: ["gpio32"],           // lampes extérieur (sans véranda)
     ventilateur: ["gpio14"],
 };
 
 // Groupes logiques
 const GROUPS = {
-    interieur: ["gpio26", "gpio27", "gpio25", "gpio33"], // salon + chambre + cuisine + véranda
-    exterieur: ["gpio32", "gpio33"],                      // lampes ext + véranda
-    tout:      ["gpio26", "gpio27", "gpio25", "gpio33", "gpio32", "gpio14"],
+    interieur: ["gpio26", "gpio27", "gpio25"], // salon + chambre + cuisine 
+    exterieur: ["gpio32", "gpio33"],          // lampes ext + véranda
+    tout: ["gpio26", "gpio27", "gpio25", "gpio33", "gpio32", "gpio14"],
 };
 
 // Noms lisibles pour les retours WhatsApp
@@ -129,7 +129,7 @@ async function handleCommand(cmd, sock, from) {
     // ---- ALLUMER groupes ----
     if (c.match(/allume[sz]?\s+int[eé]rieur/)) {
         await setPins(GROUPS.interieur, "on");
-        return "✅ Intérieur allumé (Salon, Chambre, Cuisine, Véranda)";
+        return "✅ Intérieur allumé (Salon, Chambre, Cuisine)";
     }
     if (c.match(/allume[sz]?\s+ext[eé]rieur/)) {
         await setPins(GROUPS.exterieur, "on");
@@ -165,7 +165,7 @@ async function handleCommand(cmd, sock, from) {
     // ---- ÉTEINDRE groupes ----
     if (c.match(/[eé]tein[st]\s+int[eé]rieur/)) {
         await setPins(GROUPS.interieur, "off");
-        return "🔴 Intérieur éteint (Salon, Chambre, Cuisine, Véranda)";
+        return "🔴 Intérieur éteint (Salon, Chambre, Cuisine)";
     }
     if (c.match(/[eé]tein[st]\s+tout/)) {
         await setPins(GROUPS.tout, "off");
@@ -213,10 +213,10 @@ async function handleCommand(cmd, sock, from) {
         });
 
         const temp = states.temperature != null ? `${states.temperature}°C` : "N/A";
-        const hum  = states.humidite    != null ? `${states.humidite}%`    : "N/A";
+        const hum = states.humidite != null ? `${states.humidite}%` : "N/A";
 
         return (
-`🏠 *État de la maison :*
+            `🏠 *État de la maison :*
 
 ${lines.join("\n")}
 
@@ -228,7 +228,7 @@ ${lines.join("\n")}
     // ---- AIDE ----
     if (c.match(/aide|help|\?/)) {
         return (
-`🏠 *Commandes SmartHome disponibles :*
+            `🏠 *Commandes SmartHome disponibles :*
 
 💡 *Allumer :*
 • allumes salon / chambre / cuisine / veranda
